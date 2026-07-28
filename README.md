@@ -128,8 +128,13 @@ Claude Code: installed — /Users/you/.claude/settings.json
 Codex: installed — /Users/you/.codex/hooks.json
 ```
 
-For Codex, open `/hooks` once and trust the NotchPal command hook. Codex deliberately
-skips new or changed non-managed hooks until their exact definition is reviewed.
+**Codex needs one extra step.** Claude Code runs the hooks as soon as they are
+registered; Codex deliberately ignores any new or changed hook until you have
+reviewed exactly what it runs. Enable them once:
+
+- **Codex app** — open Settings and allow Hooks.
+- **Codex CLI** — run `/hooks` and trust the NotchPal command.
+
 Then start a session in either agent; the notch should come alive on your first prompt.
 
 ---
