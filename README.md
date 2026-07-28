@@ -231,7 +231,7 @@ An ambient display earns its place by being quiet.
 | Turn starts / ends | Expands for a couple of seconds, then settles |
 | Agent needs permission | Expands and **stays** until it is resolved |
 | You hover it | Expands, because that is you asking |
-| You click a row | Dismisses that session |
+| You hover a row | An **✕** appears — click it to dismiss that session |
 
 Expanding on every tool call would strobe. If you want more, there is one setting
 — *Expand when the work changes* — which expands briefly when the agent switches

@@ -37,12 +37,18 @@ struct ExpandedView: View {
         GlassEffectContainer(spacing: 18) {
             VStack(alignment: .leading, spacing: 9) {
                 if let hero {
-                    Row(session: hero, chrome: chrome, glass: glass, size: 34, font: 13)
-                        .onTapGesture { model.dismiss(hero.key) }
+                    Row(
+                        session: hero, chrome: chrome, glass: glass,
+                        size: 34, font: 13,
+                        dismiss: { model.dismiss(hero.key) }
+                    )
                     ForEach(others) { session in
-                        Row(session: session, chrome: chrome, glass: glass, size: 22, font: 11)
-                            .opacity(0.72)
-                            .onTapGesture { model.dismiss(session.key) }
+                        Row(
+                            session: session, chrome: chrome, glass: glass,
+                            size: 22, font: 11,
+                            dismiss: { model.dismiss(session.key) }
+                        )
+                        .opacity(0.72)
                     }
                 } else {
                     IdleRow(chrome: chrome, banner: model.banner, listening: model.isListening)
@@ -63,6 +69,9 @@ private struct Row: View {
     let glass: Namespace.ID
     let size: CGFloat
     let font: CGFloat
+    let dismiss: () -> Void
+
+    @State private var isHovering = false
 
     var body: some View {
         HStack(alignment: .center, spacing: 11) {
@@ -87,7 +96,19 @@ private struct Row: View {
                         .foregroundStyle(chrome.secondary)
                 }
             }
+
+            DismissButton(chrome: chrome, size: font + 5, action: dismiss)
+                // Hidden until you reach for it, so the resting card stays a
+                // read-out rather than a control panel. Space is reserved either
+                // way so nothing shifts when it appears.
+                .opacity(isHovering ? 1 : 0)
+                // A zero-opacity view still takes clicks; without this the card
+                // would have an invisible button sitting on it.
+                .allowsHitTesting(isHovering)
+                .animation(.easeOut(duration: 0.16), value: isHovering)
         }
+        .contentShape(.rect)
+        .onHover { isHovering = $0 }
     }
 
     @ViewBuilder
@@ -153,6 +174,41 @@ private struct Row: View {
 
         if let project = session.projectName { parts.append(project) }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+}
+
+/// Dismisses one session's card.
+///
+/// This exists because of a gap NotchPal cannot close on its own: when *you*
+/// stop an agent — Escape, Ctrl-C, closing the terminal — no `Stop` and no
+/// `SessionEnd` hook is ever fired, so nothing tells NotchPal the work ended.
+/// The staleness sweep eventually retires the card, but "eventually" is no help
+/// when you are looking at a timer counting up for work you know is over.
+///
+/// It dismisses the card, not the agent. Hooks are one-way — the agent spawns
+/// the reporter, the reporter writes a line and exits — so there is no channel
+/// back, and no payload carries a process id. A button labelled "Stop" that
+/// cannot stop anything would be worse than no button.
+private struct DismissButton: View {
+    let chrome: Chrome
+    var size: CGFloat
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "xmark")
+                .font(.system(size: size * 0.42, weight: .bold))
+                .foregroundStyle(isHovering ? chrome.primary : chrome.tertiary)
+                .frame(width: size, height: size)
+                .background(Circle().fill(chrome.controlFill(hovering: isHovering)))
+                .contentShape(.circle)
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+        .help("Dismiss this card. NotchPal cannot stop the agent itself.")
+        .accessibilityLabel("Dismiss this session")
     }
 }
 
@@ -231,5 +287,12 @@ private extension Chrome {
 
     var tertiary: Color {
         self == .notch ? .white.opacity(0.44) : .secondary.opacity(0.65)
+    }
+
+    /// Backing for a small round control. Barely there at rest, legible on hover.
+    func controlFill(hovering: Bool) -> Color {
+        self == .notch
+            ? .white.opacity(hovering ? 0.18 : 0.09)
+            : .primary.opacity(hovering ? 0.12 : 0.06)
     }
 }
