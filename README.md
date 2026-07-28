@@ -86,8 +86,8 @@ not authorized.
 ### From Xcode
 
 ```bash
-git clone https://github.com/YOURNAME/notchpal.git
-cd notchpal
+git clone https://github.com/simonveprek/NotchPal.git
+cd NotchPal
 open Package.swift
 ```
 
