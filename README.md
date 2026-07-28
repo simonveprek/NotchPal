@@ -5,6 +5,8 @@
 NotchPal is a tiny macOS menu bar agent that shows what Claude Code and OpenAI Codex
 are doing right now — in the Dynamic Island area of your MacBook's notch.
 
+**[See it running at mac.simonveprek.cz →](https://mac.simonveprek.cz/apps/notchpal)**
+
 > [!IMPORTANT]
 > **NotchPal is source-available from this GitHub repository.** You may use it,
 > copy it, modify it, fork it, and redistribute it. You may not sell NotchPal or
@@ -45,6 +47,7 @@ When nothing is running, NotchPal shows nothing at all.
 - [Privacy](#privacy)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
+- [See more](#see-more)
 - [Trademarks](#trademarks)
 - [License](#license)
 
@@ -455,10 +458,19 @@ mark with more care than the Anthropic one.
 If you would rather not carry that at all, `BrandMark.data(for:)` is a single
 function and swapping in neutral geometric glyphs is a one-line change.
 
+## See more
+
+A live demo of the notch, the full feature tour, and the rest of the Mac apps
+live at **[mac.simonveprek.cz](https://mac.simonveprek.cz)**. The source for that
+site is in [`site/`](site).
+
 ## Credits
 
 Built on [DynamicNotchKit](https://github.com/MrKai77/DynamicNotchKit) by
 Kai Azim (MIT).
+
+The desktop wallpaper used in the website's demo (`site/public/bg.webp`) is
+AI-generated, and is included here only as set dressing for the screenshot.
 
 ## License
 
