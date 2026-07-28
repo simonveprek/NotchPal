@@ -12,13 +12,10 @@ build/
 # library, so pinning the resolved dependency versions is what makes someone
 # else's clone build the same thing yours does.
 
-# Website (site/)
+# Belt and braces: the website that used to live here now has its own
+# repository, but keep these so a stray node_modules can never sneak in.
 node_modules/
 .next/
-out/
-next-env.d.ts
-.vercel
-*.tsbuildinfo
 
 # Intermediate output of Scripts/make-icon.swift. AppIcon.icns and AppIcon.png
 # are committed because the build script and the README need them; the iconset

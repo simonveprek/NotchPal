@@ -467,15 +467,15 @@ function and swapping in neutral geometric glyphs is a one-line change.
 
 A live demo of the notch, the full feature tour, and the rest of the Mac apps
 live at **[mac.simonveprek.cz](https://mac.simonveprek.cz)**. The source for that
-site is in [`site/`](site).
+site lives in its own repository.
 
 ## Credits
 
 Built on [DynamicNotchKit](https://github.com/MrKai77/DynamicNotchKit) by
 Kai Azim (MIT).
 
-The desktop wallpaper used in the website's demo (`site/public/bg.webp`) is
-AI-generated, and is included here only as set dressing for the screenshot.
+The desktop wallpaper used in the website's demo is AI-generated, and appears
+there only as set dressing for the screenshot.
 
 ## License
 
