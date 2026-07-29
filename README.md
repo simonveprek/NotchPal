@@ -86,6 +86,29 @@ NotchPal is intended to be cloned or downloaded from this GitHub repository and
 built locally. Official source and updates live here; paid redistributions are
 not authorized.
 
+### Download a build
+
+Grab the latest `NotchPal-x.y.z.zip` from
+[Releases](https://github.com/simonveprek/NotchPal/releases), unzip it, and move
+**NotchPal.app** to Applications.
+
+> [!WARNING]
+> Release builds are **not notarized**, so macOS will refuse to open the app the
+> first time — "Apple could not verify NotchPal is free of malware". Notarizing
+> requires a paid Apple Developer ID this project does not have.
+>
+> On macOS 15 and later, right-click → Open no longer bypasses this. Either:
+>
+> 1. Try to open the app, click **Done**, then go to **System Settings › Privacy
+>    & Security**, scroll to Security, and click **Open Anyway**; or
+> 2. Clear the quarantine flag yourself:
+>    ```bash
+>    xattr -dr com.apple.quarantine /Applications/NotchPal.app
+>    ```
+>
+> Building from source below avoids this entirely — the binary never gets
+> quarantined because it never came from the internet.
+
 ### From Xcode
 
 ```bash
@@ -320,6 +343,12 @@ Everything lives in the menu bar item.
 | Claude Code hooks | off until you turn them on |
 | Codex hooks | off until you turn them on |
 | Expand when the work changes | off |
+| Open at Login | off |
+
+**Open at Login** registers the app with macOS through `SMAppService`, so it also
+appears under System Settings › General › Login Items and can be turned off
+there. It needs the bundled app — running the executable straight from
+`swift build` gives macOS no bundle to register, and the menu item says so.
 
 Environment:
 

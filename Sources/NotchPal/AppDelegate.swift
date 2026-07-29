@@ -159,6 +159,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Preferences.shared.expandOnToolChange.toggle()
     }
 
+    @objc private func toggleLoginItem() {
+        if let problem = LoginItem.setEnabled(!LoginItem.isEnabled) {
+            let alert = NSAlert()
+            alert.messageText = "Could not change Open at Login"
+            alert.informativeText = problem
+            alert.alertStyle = .warning
+            alert.runModal()
+        }
+    }
+
     @objc private func showStatus() {
         controller.peek()
     }
@@ -221,6 +231,18 @@ extension AppDelegate: NSMenuDelegate {
         expand.target = self
         expand.state = Preferences.shared.expandOnToolChange ? .on : .off
         menu.addItem(expand)
+
+        let login = NSMenuItem(
+            title: LoginItem.unavailableReason.map { "Open at Login — \($0)" } ?? "Open at Login",
+            action: #selector(toggleLoginItem),
+            keyEquivalent: ""
+        )
+        login.target = self
+        login.state = LoginItem.isEnabled ? .on : .off
+        // Reads live from SMAppService, so it stays correct even when the user
+        // changes it in System Settings instead of here.
+        login.isEnabled = LoginItem.isSupported
+        menu.addItem(login)
 
         menu.addItem(action("Show status", #selector(showStatus)))
         menu.addItem(action("Forget sessions", #selector(forgetSessions)))
