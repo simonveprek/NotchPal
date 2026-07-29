@@ -70,7 +70,45 @@ PLIST
 # (CODESIGN_IDENTITY=...) before distributing a build to anyone else.
 IDENTITY="${CODESIGN_IDENTITY:--}"
 echo "▸ Signing with identity: ${IDENTITY}"
+
+# Clear extended attributes first. macOS stamps `com.apple.provenance` on
+# binaries it has seen, and that attribute makes bundle-level verification fail
+# with "Operation not permitted" on the nested executable even though the
+# executable verifies fine on its own.
+xattr -cr "${APP}"
+
 codesign --force --sign "${IDENTITY}" --timestamp=none "${APP}/Contents/MacOS/notchpal-report"
 codesign --force --sign "${IDENTITY}" --timestamp=none "${APP}"
 
+# Fail loudly here rather than shipping something that dies with SIGKILL on
+# someone else's Mac.
+codesign --verify --verbose=2 "${APP}"
+
+# Package.
+#
+# `ditto -c -k --keepParent` is the form Apple documents for a signed bundle.
+# Do NOT add --sequesterRsrc: it writes the bundle's extended attributes into
+# __MACOSX sidecar entries, and Finder does not restore them faithfully on
+# extraction. The signature then fails to validate and macOS kills the app at
+# launch with "Code Signature Invalid" — which is exactly what shipped in 1.1.0.
+ZIP="${BUILD_DIR}/${APP_NAME}-${VERSION}.zip"
+echo "▸ Packaging ${ZIP}"
+rm -f "${ZIP}"
+ditto -c -k --keepParent "${APP}" "${ZIP}"
+
+if unzip -l "${ZIP}" | grep -q "__MACOSX"; then
+  echo "✗ Archive contains __MACOSX sidecars — the signature will not survive extraction." >&2
+  exit 1
+fi
+
+# Round-trip the archive and check the signature actually survived, because a
+# valid signature on disk says nothing about what the user unzips.
+VERIFY_DIR="${BUILD_DIR}/.verify"
+rm -rf "${VERIFY_DIR}"
+mkdir -p "${VERIFY_DIR}"
+ditto -x -k "${ZIP}" "${VERIFY_DIR}"
+codesign --verify --verbose=2 "${VERIFY_DIR}/${APP_NAME}.app"
+rm -rf "${VERIFY_DIR}"
+
 echo "▸ Done: ${APP}"
+echo "▸ Done: ${ZIP}  ($(shasum -a 256 "${ZIP}" | cut -d' ' -f1))"
